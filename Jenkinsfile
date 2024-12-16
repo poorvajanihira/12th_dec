@@ -2,9 +2,7 @@ pipeline {
     agent any
 
     environment {
-        AWS_DEFAULT_REGION = 'ap-south-1'
-        TF_VAR_aws_access_key = credentials('aws-credentials').AWS_ACCESS_KEY_ID
-        TF_VAR_aws_secret_key = credentials('aws-credentials').AWS_SECRET_ACCESS_KEY
+        AWS_DEFAULT_REGION = 'ap-south-1' // Set the AWS region as an environment variable
     }
 
     stages {
@@ -16,33 +14,41 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                sh '''
-                terraform init
-                '''
+                withCredentials([aws(credentialsId: 'aws-credentials')]) {
+                    sh '''
+                    terraform init
+                    '''
+                }
             }
         }
 
         stage('Terraform Validate') {
             steps {
-                sh '''
-                terraform validate
-                '''
+                withCredentials([aws(credentialsId: 'aws-credentials')]) {
+                    sh '''
+                    terraform validate
+                    '''
+                }
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh '''
-                terraform plan
-                '''
+                withCredentials([aws(credentialsId: 'aws-credentials')]) {
+                    sh '''
+                    terraform plan
+                    '''
+                }
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                sh '''
-                terraform apply -auto-approve
-                '''
+                withCredentials([aws(credentialsId: 'aws-credentials')]) {
+                    sh '''
+                    terraform apply -auto-approve
+                    '''
+                }
             }
         }
     }
